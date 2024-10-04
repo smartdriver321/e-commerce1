@@ -13,6 +13,7 @@ import ShoppingHome from './pages/shopping-view/home'
 import ShoppingListing from './pages/shopping-view/listing'
 import ShoppingCheckout from './pages/shopping-view/checkout'
 import ShoppingAccount from './pages/shopping-view/account'
+import NotFound from './pages/not-found'
 
 export default function App() {
 	return (
@@ -38,6 +39,7 @@ export default function App() {
 					<Route path='checkout' element={<ShoppingCheckout />} />
 					<Route path='account' element={<ShoppingAccount />} />
 				</Route>
+				<Route path='*' element={<NotFound />} />
 			</Routes>
 		</div>
 	)
