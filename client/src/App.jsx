@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import CheckAuth from './components/common/check-auth'
 import AuthLayout from './components/auth/layout'
@@ -17,12 +18,11 @@ import NotFound from './pages/not-found'
 import UnauthPage from './pages/unauth-page'
 
 export default function App() {
-	const isAuthenticated = false
+	const { user, isAuthenticated, isLoading } = useSelector(
+		(state) => state.auth
+	)
 
-	const user = {
-		name: 'smart',
-		role: 'admin',
-	}
+	console.log(isLoading, user)
 
 	return (
 		<div className='flex flex-col overflow-x-hidden bg-white'>

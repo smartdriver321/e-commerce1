@@ -23,10 +23,27 @@ export const registerUser = createAsyncThunk(
 	}
 )
 
+export const loginUser = createAsyncThunk(
+	'/auth/login',
+
+	async (formData) => {
+		const response = await axios.post(
+			'http://localhost:5000/api/auth/login',
+			formData,
+			{
+				withCredentials: true,
+			}
+		)
+
+		return response.data
+	}
+)
+
 const authSlice = createSlice({
 	name: 'auth',
 	initialState,
 	reducers: {
+		// eslint-disable-next-line no-unused-vars
 		setUser: (state, action) => {},
 	},
 	extraReducers: (builder) => {
@@ -34,12 +51,30 @@ const authSlice = createSlice({
 			.addCase(registerUser.pending, (state) => {
 				state.isLoading = true
 			})
+			// eslint-disable-next-line no-unused-vars
 			.addCase(registerUser.fulfilled, (state, action) => {
 				state.isLoading = false
 				state.user = null
 				state.isAuthenticated = false
 			})
+			// eslint-disable-next-line no-unused-vars
 			.addCase(registerUser.rejected, (state, action) => {
+				state.isLoading = false
+				state.user = null
+				state.isAuthenticated = false
+			})
+			.addCase(loginUser.pending, (state) => {
+				state.isLoading = true
+			})
+			.addCase(loginUser.fulfilled, (state, action) => {
+				console.log(action)
+
+				state.isLoading = false
+				state.user = action.payload.success ? action.payload.user : null
+				state.isAuthenticated = action.payload.success
+			})
+			// eslint-disable-next-line no-unused-vars
+			.addCase(loginUser.rejected, (state, action) => {
 				state.isLoading = false
 				state.user = null
 				state.isAuthenticated = false
