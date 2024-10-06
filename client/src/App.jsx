@@ -17,11 +17,11 @@ import NotFound from './pages/not-found'
 import UnauthPage from './pages/unauth-page'
 
 export default function App() {
-	const isAuthenticated = true
+	const isAuthenticated = false
 
 	const user = {
 		name: 'smart',
-		role: 'user',
+		role: 'admin',
 	}
 
 	return (
