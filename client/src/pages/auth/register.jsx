@@ -1,3 +1,3 @@
-export default function RegisterPage() {
-	return <div>RegisterPage</div>
+export default function AuthRegister() {
+	return <div>Register</div>
 }

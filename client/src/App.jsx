@@ -1,9 +1,9 @@
 import { Route, Routes } from 'react-router-dom'
 
+import CheckAuth from './components/common/check-auth'
 import AuthLayout from './components/auth/layout'
-import RegisterPage from './pages/auth/register'
-import LoginPage from './pages/auth/login'
-import AdminLayout from './components/admin-view/layout'
+import AuthRegister from './pages/auth/register'
+import AuthLogin from './pages/auth/login'
 import AdminDashboard from './pages/admin-view/dashboard'
 import AdminProducts from './pages/admin-view/products'
 import AdminOrders from './pages/admin-view/orders'
@@ -14,31 +14,71 @@ import ShoppingListing from './pages/shopping-view/listing'
 import ShoppingCheckout from './pages/shopping-view/checkout'
 import ShoppingAccount from './pages/shopping-view/account'
 import NotFound from './pages/not-found'
+import UnauthPage from './pages/unauth-page'
 
 export default function App() {
+	const isAuthenticated = true
+
+	const user = {
+		name: 'smart',
+		role: 'user',
+	}
+
 	return (
 		<div className='flex flex-col overflow-x-hidden bg-white'>
 			<h1>Header</h1>
 
 			<Routes>
-				<Route path='/auth' element={<AuthLayout />}>
-					<Route path='register' element={<RegisterPage />} />
-					<Route path='login' element={<LoginPage />} />
+				<Route
+					path='/'
+					element={
+						<CheckAuth
+							isAuthenticated={isAuthenticated}
+							user={user}
+						></CheckAuth>
+					}
+				/>
+
+				<Route
+					path='/auth'
+					element={
+						<CheckAuth isAuthenticated={isAuthenticated} user={user}>
+							<AuthLayout />
+						</CheckAuth>
+					}
+				>
+					<Route path='register' element={<AuthRegister />} />
+					<Route path='login' element={<AuthLogin />} />
 				</Route>
 
-				<Route path='/admin' element={<AdminLayout />}>
+				<Route
+					path='/admin'
+					element={
+						<CheckAuth isAuthenticated={isAuthenticated} user={user}>
+							<AuthLayout />
+						</CheckAuth>
+					}
+				>
 					<Route path='dashboard' element={<AdminDashboard />} />
 					<Route path='products' element={<AdminProducts />} />
 					<Route path='orders' element={<AdminOrders />} />
 					<Route path='features' element={<AdminFeatures />} />
 				</Route>
 
-				<Route path='/shop' element={<ShoppingLayout />}>
+				<Route
+					path='/shop'
+					element={
+						<CheckAuth isAuthenticated={isAuthenticated} user={user}>
+							<ShoppingLayout />
+						</CheckAuth>
+					}
+				>
 					<Route path='home' element={<ShoppingHome />} />
 					<Route path='listing' element={<ShoppingListing />} />
 					<Route path='checkout' element={<ShoppingCheckout />} />
 					<Route path='account' element={<ShoppingAccount />} />
 				</Route>
+				<Route path='/unauth-page' element={<UnauthPage />} />
 				<Route path='*' element={<NotFound />} />
 			</Routes>
 		</div>
