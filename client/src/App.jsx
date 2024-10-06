@@ -19,6 +19,7 @@ import ShoppingAccount from './pages/shopping-view/account'
 import NotFound from './pages/not-found'
 import UnauthPage from './pages/unauth-page'
 import { Skeleton } from './components/ui/skeleton'
+import AdminLayout from './components/admin-view/layout'
 
 export default function App() {
 	const dispatch = useDispatch()
@@ -35,9 +36,7 @@ export default function App() {
 	console.log(isLoading, user)
 
 	return (
-		<div className='flex flex-col overflow-x-hidden bg-white'>
-			<h1>Header</h1>
-
+		<div className='flex flex-col overflow-hidden bg-white'>
 			<Routes>
 				<Route
 					path='/'
@@ -48,7 +47,6 @@ export default function App() {
 						></CheckAuth>
 					}
 				/>
-
 				<Route
 					path='/auth'
 					element={
@@ -57,15 +55,15 @@ export default function App() {
 						</CheckAuth>
 					}
 				>
-					<Route path='register' element={<AuthRegister />} />
 					<Route path='login' element={<AuthLogin />} />
+					<Route path='register' element={<AuthRegister />} />
 				</Route>
 
 				<Route
 					path='/admin'
 					element={
 						<CheckAuth isAuthenticated={isAuthenticated} user={user}>
-							<AuthLayout />
+							<AdminLayout />
 						</CheckAuth>
 					}
 				>
@@ -88,6 +86,7 @@ export default function App() {
 					<Route path='checkout' element={<ShoppingCheckout />} />
 					<Route path='account' element={<ShoppingAccount />} />
 				</Route>
+
 				<Route path='/unauth-page' element={<UnauthPage />} />
 				<Route path='*' element={<NotFound />} />
 			</Routes>
