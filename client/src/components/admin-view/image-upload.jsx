@@ -14,9 +14,12 @@ export default function ProductImageUpload({
 	imageLoadingState,
 	setUploadedImageUrl,
 	setImageLoadingState,
+	isEditMode,
 	isCustomStyling = false,
 }) {
 	const inputRef = useRef(null)
+
+	console.log(isEditMode, 'isEditMode')
 
 	function handleImageFileChange(event) {
 		console.log(event.target.files, 'event.target.files')
@@ -33,13 +36,11 @@ export default function ProductImageUpload({
 	function handleDrop(event) {
 		event.preventDefault()
 		const droppedFile = event.dataTransfer.files?.[0]
-
 		if (droppedFile) setImageFile(droppedFile)
 	}
 
 	function handleRemoveImage() {
 		setImageFile(null)
-
 		if (inputRef.current) {
 			inputRef.current.value = ''
 		}
@@ -49,7 +50,6 @@ export default function ProductImageUpload({
 		setImageLoadingState(true)
 		const data = new FormData()
 		data.append('my_file', imageFile)
-
 		const response = await axios.post(
 			'http://localhost:5000/api/admin/products/upload-image',
 			data
@@ -72,16 +72,28 @@ export default function ProductImageUpload({
 			className={`w-full  mt-4 ${isCustomStyling ? '' : 'max-w-md mx-auto'}`}
 		>
 			<Label className='text-lg font-semibold mb-2 block'>Upload Image</Label>
-			<div onDragOver={handleDragOver} onDrop={handleDrop}>
+			<div
+				onDragOver={handleDragOver}
+				onDrop={handleDrop}
+				className={`${
+					isEditMode ? 'opacity-60' : ''
+				} border-2 border-dashed rounded-lg p-4`}
+			>
 				<Input
 					id='image-upload'
 					type='file'
 					className='hidden'
 					ref={inputRef}
 					onChange={handleImageFileChange}
+					disabled={isEditMode}
 				/>
 				{!imageFile ? (
-					<Label htmlFor='image-upload'>
+					<Label
+						htmlFor='image-upload'
+						className={`${
+							isEditMode ? 'cursor-not-allowed' : ''
+						} flex flex-col items-center justify-center h-32 cursor-pointer`}
+					>
 						<UploadCloudIcon className='w-10 h-10 text-muted-foreground mb-2' />
 						<span>Drag & drop or click to upload image</span>
 					</Label>
