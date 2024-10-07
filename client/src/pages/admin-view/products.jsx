@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { addProductFormElements } from '@/config'
 import {
 	addNewProduct,
+	deleteProduct,
 	editProduct,
 	fetchAllProducts,
 } from '@/store/admin/products-slice'
@@ -87,6 +88,14 @@ export default function AdminProductsPage() {
 			.every((item) => item)
 	}
 
+	function handleDelete(getCurrentProductId) {
+		dispatch(deleteProduct(getCurrentProductId)).then((data) => {
+			if (data?.payload?.success) {
+				dispatch(fetchAllProducts())
+			}
+		})
+	}
+
 	useEffect(() => {
 		dispatch(fetchAllProducts())
 	}, [dispatch])
@@ -109,6 +118,7 @@ export default function AdminProductsPage() {
 								setOpenCreateProductsDialog={setOpenCreateProductsDialog}
 								setCurrentEditedId={setCurrentEditedId}
 								product={productItem}
+								handleDelete={handleDelete}
 							/>
 					  ))
 					: null}
