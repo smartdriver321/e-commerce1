@@ -2,8 +2,10 @@ const express = require('express')
 const mongoose = require('mongoose')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
+require('dotenv').config()
 
 const authRouter = require('./routes/auth/auth-routes')
+const adminProductsRouter = require('./routes/admin/products-routes')
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -27,11 +29,10 @@ app.use(
 )
 
 app.use('/api/auth', authRouter)
+app.use('/api/admin/products', adminProductsRouter)
 
 mongoose
-	.connect(
-		'mongodb+srv://smart:admin@cluster0.d35uolv.mongodb.net/e-commerce1?retryWrites=true&w=majority&appName=Cluster0'
-	)
+	.connect(process.env.MONGO_URI)
 	.then(() => console.log('MongoDB connected'))
 	.catch((error) => console.log(error))
 
