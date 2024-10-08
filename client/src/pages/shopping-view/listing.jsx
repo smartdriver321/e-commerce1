@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { ArrowUpDownIcon } from 'lucide-react'
 
 import { sortOptions } from '@/config'
 import { fetchAllFilteredProducts } from '@/store/shop/products-slice'
+import ShoppingProductTile from './product-tile'
 import ProductFilter from '@/components/shopping-view/filter'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,27 +15,83 @@ import {
 	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import ShoppingProductTile from './product-tile'
+
+function createSearchParamsHelper(filterParams) {
+	const queryParams = []
+
+	for (const [key, value] of Object.entries(filterParams)) {
+		if (Array.isArray(value) && value.length > 0) {
+			const paramValue = value.join(',')
+
+			queryParams.push(`${key}=${encodeURIComponent(paramValue)}`)
+		}
+	}
+
+	console.log(queryParams, 'queryParams')
+
+	return queryParams.join('&')
+}
 
 export default function ShoppingListing() {
+	const [searchParams, setSearchParams] = useSearchParams()
+	const categorySearchParam = searchParams.get('category')
+
 	const dispatch = useDispatch()
 	const { productList } = useSelector((state) => state.shopProducts)
 
+	const [filters, setFilters] = useState({})
 	const [sort, setSort] = useState(null)
+
+	function handleFilter(getSectionId, getCurrentOption) {
+		console.log(getSectionId, getCurrentOption)
+
+		let cpyFilters = { ...filters }
+		const indexOfCurrentSection = Object.keys(cpyFilters).indexOf(getSectionId)
+
+		if (indexOfCurrentSection === -1) {
+			cpyFilters = {
+				...cpyFilters,
+				[getSectionId]: [getCurrentOption],
+			}
+		} else {
+			const indexOfCurrentOption =
+				cpyFilters[getSectionId].indexOf(getCurrentOption)
+
+			if (indexOfCurrentOption === -1)
+				cpyFilters[getSectionId].push(getCurrentOption)
+			else cpyFilters[getSectionId].splice(indexOfCurrentOption, 1)
+		}
+
+		setFilters(cpyFilters)
+		sessionStorage.setItem('filters', JSON.stringify(cpyFilters))
+	}
 
 	function handleSort(value) {
 		setSort(value)
 	}
 
 	useEffect(() => {
-		dispatch(fetchAllFilteredProducts())
-	}, [dispatch])
+		if (filters !== null && sort !== null)
+			dispatch(
+				fetchAllFilteredProducts({ filterParams: filters, sortParams: sort })
+			)
+	}, [dispatch, sort, filters])
 
-	console.log(productList)
+	useEffect(() => {
+		setSort('price-lowtohigh')
+		setFilters(JSON.parse(sessionStorage.getItem('filters')) || {})
+	}, [categorySearchParam])
+
+	useEffect(() => {
+		if (filters && Object.keys(filters).length > 0) {
+			const createQueryString = createSearchParamsHelper(filters)
+			setSearchParams(new URLSearchParams(createQueryString))
+		}
+	}, [filters])
 
 	return (
 		<div className='grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6'>
-			<ProductFilter />
+			<ProductFilter filters={filters} handleFilter={handleFilter} />
 
 			<div className='bg-background w-full rounded-lg shadow-sm'>
 				<div className='p-4 border-b flex items-center justify-between'>
