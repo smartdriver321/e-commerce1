@@ -4,7 +4,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ArrowUpDownIcon } from 'lucide-react'
 
 import { sortOptions } from '@/config'
-import { fetchAllFilteredProducts } from '@/store/shop/products-slice'
+import {
+	fetchAllFilteredProducts,
+	fetchProductDetails,
+} from '@/store/shop/products-slice'
 import ShoppingProductTile from './product-tile'
 import ProductFilter from '@/components/shopping-view/filter'
 import { Button } from '@/components/ui/button'
@@ -15,6 +18,7 @@ import {
 	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import ProductDetailsDialog from './product-details'
 
 function createSearchParamsHelper(filterParams) {
 	const queryParams = []
@@ -37,10 +41,13 @@ export default function ShoppingListing() {
 	const categorySearchParam = searchParams.get('category')
 
 	const dispatch = useDispatch()
-	const { productList } = useSelector((state) => state.shopProducts)
+	const { productList, productDetails } = useSelector(
+		(state) => state.shopProducts
+	)
 
 	const [filters, setFilters] = useState({})
 	const [sort, setSort] = useState(null)
+	const [openDetailsDialog, setOpenDetailsDialog] = useState(false)
 
 	function handleFilter(getSectionId, getCurrentOption) {
 		console.log(getSectionId, getCurrentOption)
@@ -70,6 +77,11 @@ export default function ShoppingListing() {
 		setSort(value)
 	}
 
+	function handleGetProductDetails(getCurrentProductId) {
+		console.log(getCurrentProductId)
+		dispatch(fetchProductDetails(getCurrentProductId))
+	}
+
 	useEffect(() => {
 		if (filters !== null && sort !== null)
 			dispatch(
@@ -88,6 +100,12 @@ export default function ShoppingListing() {
 			setSearchParams(new URLSearchParams(createQueryString))
 		}
 	}, [filters])
+
+	useEffect(() => {
+		if (productDetails !== null) setOpenDetailsDialog(true)
+	}, [productDetails])
+
+	console.log(productDetails)
 
 	return (
 		<div className='grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 p-4 md:p-6'>
@@ -132,11 +150,17 @@ export default function ShoppingListing() {
 								<ShoppingProductTile
 									key={productItem.id}
 									product={productItem}
+									handleGetProductDetails={handleGetProductDetails}
 								/>
 						  ))
 						: null}
 				</div>
 			</div>
+			<ProductDetailsDialog
+				open={openDetailsDialog}
+				setOpen={setOpenDetailsDialog}
+				productDetails={productDetails}
+			/>
 		</div>
 	)
 }
