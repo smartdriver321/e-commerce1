@@ -3,12 +3,15 @@ import { useSearchParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { ArrowUpDownIcon } from 'lucide-react'
 
-import { sortOptions } from '@/config'
 import {
 	fetchAllFilteredProducts,
 	fetchProductDetails,
 } from '@/store/shop/products-slice'
-import ShoppingProductTile from './product-tile'
+import { addToCart, fetchCartItems } from '@/store/shop/cart-slice'
+import { sortOptions } from '@/config'
+import { toast } from '@/hooks/use-toast'
+import ProductDetailsDialog from '../../components/shopping-view/product-details'
+import ShoppingProductTile from '../../components/shopping-view/product-tile'
 import ProductFilter from '@/components/shopping-view/filter'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +21,6 @@ import {
 	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import ProductDetailsDialog from './product-details'
 
 function createSearchParamsHelper(filterParams) {
 	const queryParams = []
@@ -41,9 +43,11 @@ export default function ShoppingListing() {
 	const categorySearchParam = searchParams.get('category')
 
 	const dispatch = useDispatch()
+	const { user } = useSelector((state) => state.auth)
 	const { productList, productDetails } = useSelector(
 		(state) => state.shopProducts
 	)
+	const { cartItems } = useSelector((state) => state.shopCart)
 
 	const [filters, setFilters] = useState({})
 	const [sort, setSort] = useState(null)
@@ -80,6 +84,43 @@ export default function ShoppingListing() {
 	function handleGetProductDetails(getCurrentProductId) {
 		console.log(getCurrentProductId)
 		dispatch(fetchProductDetails(getCurrentProductId))
+	}
+
+	function handleAddtoCart(getCurrentProductId, getTotalStock) {
+		console.log(cartItems)
+		let getCartItems = cartItems.items || []
+
+		if (getCartItems.length) {
+			const indexOfCurrentItem = getCartItems.findIndex(
+				(item) => item.productId === getCurrentProductId
+			)
+			if (indexOfCurrentItem > -1) {
+				const getQuantity = getCartItems[indexOfCurrentItem].quantity
+				if (getQuantity + 1 > getTotalStock) {
+					toast({
+						title: `Only ${getQuantity} quantity can be added for this item`,
+						variant: 'destructive',
+					})
+
+					return
+				}
+			}
+		}
+
+		dispatch(
+			addToCart({
+				userId: user?.id,
+				productId: getCurrentProductId,
+				quantity: 1,
+			})
+		).then((data) => {
+			if (data?.payload?.success) {
+				dispatch(fetchCartItems(user?.id))
+				toast({
+					title: 'Product is added to cart',
+				})
+			}
+		})
 	}
 
 	useEffect(() => {
@@ -151,6 +192,7 @@ export default function ShoppingListing() {
 									key={productItem.id}
 									product={productItem}
 									handleGetProductDetails={handleGetProductDetails}
+									handleAddtoCart={handleAddtoCart}
 								/>
 						  ))
 						: null}
