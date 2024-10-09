@@ -13,6 +13,7 @@ const shopCartRouter = require('./routes/shop/cart-routes')
 const shopAddressRouter = require('./routes/shop/address-routes')
 const shopSearchRouter = require('./routes/shop/search-routes')
 const shopReviewRouter = require('./routes/shop/review-routes')
+const commonFeatureRouter = require('./routes/common/feature-routes')
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -45,7 +46,7 @@ app.use('/api/shop/cart', shopCartRouter)
 app.use('/api/shop/address', shopAddressRouter)
 app.use('/api/shop/search', shopSearchRouter)
 app.use('/api/shop/review', shopReviewRouter)
-
+app.use('/api/common/feature', commonFeatureRouter)
 mongoose
 	.connect(process.env.MONGO_URI)
 	.then(() => console.log('MongoDB connected'))
