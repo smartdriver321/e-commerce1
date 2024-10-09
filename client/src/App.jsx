@@ -7,6 +7,7 @@ import CheckAuth from './components/common/check-auth'
 import AuthLayout from './components/auth/layout'
 import AuthRegister from './pages/auth/register'
 import AuthLogin from './pages/auth/login'
+import AdminLayout from './components/admin-view/layout'
 import AdminDashboard from './pages/admin-view/dashboard'
 import AdminProducts from './pages/admin-view/products'
 import AdminOrders from './pages/admin-view/orders'
@@ -18,8 +19,9 @@ import ShoppingCheckout from './pages/shopping-view/checkout'
 import ShoppingAccount from './pages/shopping-view/account'
 import NotFound from './pages/not-found'
 import UnauthPage from './pages/unauth-page'
+import PaypalReturnPage from './pages/shopping-view/paypal-return'
+import PaymentSuccessPage from './pages/shopping-view/payment-success'
 import { Skeleton } from './components/ui/skeleton'
-import AdminLayout from './components/admin-view/layout'
 
 export default function App() {
 	const dispatch = useDispatch()
@@ -85,6 +87,8 @@ export default function App() {
 					<Route path='listing' element={<ShoppingListing />} />
 					<Route path='checkout' element={<ShoppingCheckout />} />
 					<Route path='account' element={<ShoppingAccount />} />
+					<Route path='paypal-return' element={<PaypalReturnPage />} />
+					<Route path='payment-success' element={<PaymentSuccessPage />} />
 				</Route>
 
 				<Route path='/unauth-page' element={<UnauthPage />} />
