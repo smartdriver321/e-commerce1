@@ -1,14 +1,22 @@
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import img from '../../assets/account.jpg'
 import Address from '@/components/shopping-view/address'
 import UserCartItemsContent from '@/components/shopping-view/cart-items-content'
+import { Button } from '@/components/ui/button'
+import { useToast } from '@/hooks/use-toast'
+import { createNewOrder } from '@/store/shop/order-slice'
 
-export default function ShoppingCheckout() {
+export default function ShoppingCheckoutPage() {
+	const { user } = useSelector((state) => state.auth)
 	const { cartItems } = useSelector((state) => state.shopCart)
+	const { approvalURL } = useSelector((state) => state.shopOrder)
+	const dispatch = useDispatch()
+	const { toast } = useToast()
 
 	const [currentSelectedAddress, setCurrentSelectedAddress] = useState(null)
+	const [isPaymentStart, setIsPaymemntStart] = useState(false)
 
 	console.log(currentSelectedAddress, 'cartItems')
 
@@ -24,6 +32,69 @@ export default function ShoppingCheckout() {
 					0
 			  )
 			: 0
+
+	function handleInitiatePaypalPayment() {
+		if (cartItems.length === 0) {
+			toast({
+				title: 'Your cart is empty. Please add items to proceed',
+				variant: 'destructive',
+			})
+
+			return
+		}
+		if (currentSelectedAddress === null) {
+			toast({
+				title: 'Please select one address to proceed.',
+				variant: 'destructive',
+			})
+
+			return
+		}
+
+		const orderData = {
+			userId: user?.id,
+			cartId: cartItems?._id,
+			cartItems: cartItems.items.map((singleCartItem) => ({
+				productId: singleCartItem?.productId,
+				title: singleCartItem?.title,
+				image: singleCartItem?.image,
+				price:
+					singleCartItem?.salePrice > 0
+						? singleCartItem?.salePrice
+						: singleCartItem?.price,
+				quantity: singleCartItem?.quantity,
+			})),
+			addressInfo: {
+				addressId: currentSelectedAddress?._id,
+				address: currentSelectedAddress?.address,
+				city: currentSelectedAddress?.city,
+				pincode: currentSelectedAddress?.pincode,
+				phone: currentSelectedAddress?.phone,
+				notes: currentSelectedAddress?.notes,
+			},
+			orderStatus: 'pending',
+			paymentMethod: 'paypal',
+			paymentStatus: 'pending',
+			totalAmount: totalCartAmount,
+			orderDate: new Date(),
+			orderUpdateDate: new Date(),
+			paymentId: '',
+			payerId: '',
+		}
+
+		dispatch(createNewOrder(orderData)).then((data) => {
+			console.log(data, 'sangam')
+			if (data?.payload?.success) {
+				setIsPaymemntStart(true)
+			} else {
+				setIsPaymemntStart(false)
+			}
+		})
+	}
+
+	if (approvalURL) {
+		window.location.href = approvalURL
+	}
 
 	return (
 		<div className='flex flex-col'>
@@ -47,7 +118,13 @@ export default function ShoppingCheckout() {
 							<span className='font-bold'>${totalCartAmount}</span>
 						</div>
 					</div>
-					<div className='mt-4 w-full'></div>
+					<div className='mt-4 w-full'>
+						<Button onClick={handleInitiatePaypalPayment} className='w-full'>
+							{isPaymentStart
+								? 'Processing Paypal Payment...'
+								: 'Checkout with Paypal'}
+						</Button>
+					</div>
 				</div>
 			</div>
 		</div>

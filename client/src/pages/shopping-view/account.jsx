@@ -1,5 +1,6 @@
 import accImg from '../../assets/account.jpg'
 import Address from '@/components/shopping-view/address'
+import ShoppingOrders from '@/components/shopping-view/orders'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function ShoppingAccount() {
@@ -15,8 +16,12 @@ export default function ShoppingAccount() {
 				<div className='flex flex-col rounded-lg border bg-background p-6 shadow-sm'>
 					<Tabs defaultValue='orders'>
 						<TabsList>
+							<TabsTrigger value='orders'>Orders</TabsTrigger>
 							<TabsTrigger value='address'>Address</TabsTrigger>
 						</TabsList>
+						<TabsContent value='orders'>
+							<ShoppingOrders />
+						</TabsContent>
 						<TabsContent value='address'>
 							<Address />
 						</TabsContent>
