@@ -8,7 +8,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { HousePlug, LogOut, Menu, ShoppingCart, UserCog } from 'lucide-react'
 
-import { logoutUser } from '@/store/auth-slice'
+import { logoutUser, resetTokenAndCredentials } from '@/store/auth-slice'
 import { fetchCartItems } from '@/store/shop/cart-slice'
 import { shoppingViewHeaderMenuItems } from '@/config'
 import UserCartWrapper from './cart-wrapper'
@@ -75,7 +75,10 @@ function HeaderRightContent() {
 	const [openCartSheet, setOpenCartSheet] = useState(false)
 
 	function handleLogout() {
-		dispatch(logoutUser())
+		// dispatch(logoutUser())
+		dispatch(resetTokenAndCredentials())
+		sessionStorage.clear()
+		navigate('/auth/login')
 	}
 
 	useEffect(() => {
